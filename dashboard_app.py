@@ -286,55 +286,6 @@ if backlog_backups_file is not None and catalog_file is not None and inventory_f
         df.to_excel(writer, sheet_name='order report')
         writer.save()
 
-        # use openpyxl to change the background colour of the status column
-        from openpyxl import load_workbook
-        # Load an existing workbook
-        wb = load_workbook(output)
-        # import patternFill
-        from openpyxl.styles import PatternFill
-        # Select the active sheet
-        ws = wb.active
-        # Iterate through the rows of the sheet
-        for row in ws.iter_rows():
-            # Check the value of the status column
-            if row[13].value == 'ONGOING ORDER':
-                # If the value is 'ONGOING ORDER', set the fill of the cell to blue
-                row[13].fill = PatternFill(start_color="5fa5de", end_color="5fa5de", fill_type = "solid")
-            elif row[13].value == 'OK':
-                # If the value is 'OK', set the fill of the cell to green
-                row[13].fill = PatternFill(start_color="6cde5f", end_color="6cde5f", fill_type = "solid")
-            elif row[13].value == 'DOES NOT SELL':
-                # If the value is 'DOES NOT SELL', set the fill of the cell to yellow
-                row[13].fill = PatternFill(start_color="dec75f", end_color="dec75f", fill_type = "solid")
-            elif row[13].value == 'ORDER NOW':
-                # If the value is 'ORDER NOW', set the fill of the cell to red
-                row[13].fill = PatternFill(start_color="de6c5f", end_color="de6c5f", fill_type = "solid")
-            elif row[13].value == 'SAFE':
-                # If the value is 'ORDER NOW', set the fill of the cell to red
-                row[13].fill = PatternFill(start_color="5fdebc", end_color="5fdebc", fill_type = "solid")
-
-
-        columns = [ws['E'], ws['F'], ws['G'], ws['H'], ws['I'], ws['L'], ws['M'], ws['O'], ws['P'], ws['Q']]
-
-        for column in columns:
-            # Iterate through the cells in the column
-            for cell in column:
-                # Set the number format of the cell to comma style
-                cell.number_format = '#,##0.00'
-
-        columns2 = [ws['J'], ws['K']]
-
-        for column in columns2:
-            # Iterate through the cells in the column
-            for cell in column:
-                # Set the number format of the cell to comma style
-                cell.number_format = 'dd/mm/yyyy'
-
-        # add filter 
-        ws.auto_filter.ref = "A1:Q1"
-
-        # save the workbook
-        wb.save(output)
         
         
         processed_data = output.getvalue()
