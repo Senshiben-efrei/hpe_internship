@@ -261,45 +261,83 @@ if backlog_backups_file is not None and catalog_file is not None and inventory_f
     # if status is OK and units ordered is 0 then set status to 'SAFE'
     order_planning.loc[(order_planning['status'] == 'OK') & (order_planning['units ordered'] == 0), 'status'] = 'SAFE'
 
+    # create a column called priority equal to 4 if status is 'OK', 0 if status is 'ORDER NOW', 1 if status is 'ONGOING ORDER', 3 if status is 'NO RECORDS IN BACKLOG', 2 if status is 'DOES NOT SELL', 5 if status is 'UNKNOWN'
+    order_planning['priority'] = np.where(order_planning['status'] == 'ORDER NOW', 0, np.where(order_planning['status'] == 'ONGOING ORDER', 1, np.where(order_planning['status'] == 'NO RECORDS IN BACKLOG', 3, np.where(order_planning['status'] == 'DOES NOT SELL', 2, np.where(order_planning['status'] == 'UNKNOWN', 5, 4)))))
+
 
 
 
     # reorder the columns
-    order_planning = order_planning[['PartID', 'Product Description', 'Distributor', 'Inventory( Units)', 'Sold Qty', 'weekly sellout', 'weeks of sales', 'time_to_ship', 'shortage point', 'reorder point', 'weeks left to order', 'units ordered', 'status', 'units processing', 'units in transit', 'units production']]
+    order_planning = order_planning[['PartID', 'Product Description', 'Distributor', 'Inventory( Units)', 'Sold Qty', 'weekly sellout', 'weeks of sales', 'time_to_ship', 'shortage point', 'reorder point', 'weeks left to order', 'units ordered', 'status', 'units processing', 'units in transit', 'units production', 'priority']]
 
     # fill the product description column from backlog_backups if its nan based on the partID grouped by partID 
     order_planning['Product Description'] = order_planning['Product Description'].fillna(order_planning['PartID'].map(backlog_backups.groupby('PartID')['Product Description'].first()))
     # sort by status
-    order_planning = order_planning.sort_values(by=['status'])
+    order_planning = order_planning.sort_values(by=['priority'])
 
     # display the order_planning dataframe
     st.write(order_planning)
 
-    # import bae64
-    import base64
     import io
+    import openpyxl
+    from openpyxl.styles import PatternFill
+    from openpyxl.utils import get_column_letter
+    import base64
 
-    # download the order_planning dataframe as an excel file
-    def to_excel(df):
-        output = io.BytesIO()
-        writer = pd.ExcelWriter(output, engine='xlsxwriter')
-        df.to_excel(writer, sheet_name='order report')
-        writer.save()
-
+    def get_formatted_excel(df):
+        # Create a memory buffer
+        buffer = io.BytesIO()
         
+        # Convert DataFrame to Excel file
+        df.to_excel(buffer, index=False)
+        buffer.seek(0)
+        # Load the Excel file
+        wb = openpyxl.load_workbook(buffer)
+        ws = wb.active
         
-        processed_data = output.getvalue()
-        return processed_data
+        # Iterate through the rows of the sheet
+        for row in ws.iter_rows():
+            # Check the value of the status column
+            if row[12].value == 'ONGOING ORDER':
+                # If the value is 'ONGOING ORDER', set the fill of the cell to blue
+                row[12].fill = PatternFill(start_color="5fa5de", end_color="5fa5de", fill_type = "solid")
+            elif row[12].value == 'OK':
+                # If the value is 'OK', set the fill of the cell to green
+                row[12].fill = PatternFill(start_color="6cde5f", end_color="6cde5f", fill_type = "solid")
+            elif row[12].value == 'DOES NOT SELL':
+                # If the value is 'DOES NOT SELL', set the fill of the cell to yellow
+                row[12].fill = PatternFill(start_color="dec75f", end_color="dec75f", fill_type = "solid")
+            elif row[12].value == 'ORDER NOW':
+                # If the value is 'ORDER NOW', set the fill of the cell to red
+                row[12].fill = PatternFill(start_color="de6c5f", end_color="de6c5f", fill_type = "solid")
+            elif row[12].value == 'SAFE':
+                # If the value is 'ORDER NOW', set the fill of the cell to red
+                row[12].fill = PatternFill(start_color="5fdebc", end_color="5fdebc", fill_type = "solid")
+        columns = [ws['E'], ws['F'], ws['G'], ws['H'], ws['D'], ws['L'], ws['K'], ws['O'], ws['P'], ws['N']]
+        for column in columns:
+            # Iterate through the cells in the column
+            for cell in column:
+                # Set the number format of the cell to comma style
+                cell.number_format = '#,##0.00'
+        columns2 = [ws['J'], ws['I']]
+        for column in columns2:
+            # Iterate through the cells in the column
+            for cell in column:
+                # Set the number format of the cell to comma style
+                cell.number_format = 'dd/mm/yyyy'
+        # delete the Q column
+        ws.delete_cols(17)
+        # add filter
+        ws.auto_filter.ref = "A1:P1"
+        # Seek the beginning of the buffer
+        buffer.seek(0)
+        # Save the Excel file to the buffer
+        wb.save(buffer)
+        # Encode the buffer as a base64 string
+        encoded_data = base64.b64encode(buffer.getvalue()).decode()
+        # Create the data URI
+        data_uri = f'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{encoded_data}'
+        # Create a link with the data URI as the href
+        st.markdown(f'<a href="{data_uri}" download="order_planning.xlsx">Download Excel</a>', unsafe_allow_html=True)
 
-    # create a download link for the order_planning dataframe
-    def get_table_download_link(df):
-        val = to_excel(df)
-        
-        b64 = base64.b64encode(val)
-        
-        return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="order_planning.xlsx">Download Excel File</a>'
-
-    # display the download link
-    st.markdown(get_table_download_link(order_planning), unsafe_allow_html=True)
-
-
+    get_formatted_excel(order_planning)
