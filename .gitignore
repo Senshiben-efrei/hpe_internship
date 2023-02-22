@@ -1,0 +1,3 @@
+# generate a git ignore that ignores all csv files
+gitignoreio -g csv
+
