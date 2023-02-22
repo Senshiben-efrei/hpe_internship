@@ -1,0 +1,17 @@
+purchase order number,Partner,Distributor,Client,Bundle config id,Product number,quantity,Description,Unit Price,Total Cost
+1,2,3,4,,JW735A,4.0,Aruba 7205 (RW) Controller," 3,619.55 "," 14,478.18 € "
+1,2,3,4,,JW118A,4.0,PC-AC-EC AC Power Cord (Europe), 1.91 , 7.64 € 
+1,2,3,4,,JW472AAE,100.0,Aruba Cntrlr Per AP Capacity Lic E-LTU, 18.41 ," 1,840.91 € "
+1,2,3,4,,JW686A,2.0,Aruba 7030 (RW) 64 AP Branch Cntlr," 1,948.41 "," 3,896.82 € "
+1,2,3,4,,JZ336A,100.0,Aruba AP-535 (RW) Unified AP, 458.18 ," 45,818.18 € "
+1,2,3,4,,Q9G69A,10.0,AP-MNT-MP10-B AP mount bracket 10-pack B, 68.18 , 681.82 € 
+1,2,3,4,,JW546AAE,100.0,Aruba LIC-AW Aruba Airwave with RAPIDS and VisualRF 1 Device License E-LTU , 49.32 ," 4,931.82 € "
+1,2,3,4,,JW473AAE ,100.0,Aruba LIC-PEF Controller Policy Enforcement Firewall Per AP License E-LTU , 18.41 ," 1,840.91 € "
+1,2,3,4,JW735A,4,Aruba 7205 (RW) Controller," 3,619.55 "," 14,478.18 € ",
+1,2,3,4,JW118A,4,PC-AC-EC AC Power Cord (Europe), 1.91 , 7.64 € ,
+1,2,3,4,JW472AAE,100,Aruba Cntrlr Per AP Capacity Lic E-LTU, 18.41 ," 1,840.91 € ",
+1,2,3,4,JW686A,2,Aruba 7030 (RW) 64 AP Branch Cntlr," 1,948.41 "," 3,896.82 € ",
+1,2,3,4,JZ336A,100,Aruba AP-535 (RW) Unified AP, 458.18 ," 45,818.18 € ",
+1,2,3,4,Q9G69A,10,AP-MNT-MP10-B AP mount bracket 10-pack B, 68.18 , 681.82 € ,
+1,2,3,4,JW546AAE,100,Aruba LIC-AW Aruba Airwave with RAPIDS and VisualRF 1 Device License E-LTU , 49.32 ," 4,931.82 € ",
+1,2,3,4,JW473AAE ,100,Aruba LIC-PEF Controller Policy Enforcement Firewall Per AP License E-LTU , 18.41 ," 1,840.91 € ",
