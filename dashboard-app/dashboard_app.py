@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import time
-from discord_webhook import DiscordWebhook
 import numpy as np
 
 import seaborn as sns
@@ -326,10 +325,6 @@ def inventory_status():
                 progress_bar.progress(10)
                 status_text.text("loading files")
 
-
-                # send report 
-                webhook = DiscordWebhook(url='https://discord.com/api/webhooks/1064563281798381708/nBbWnB5oQ-gYxU2m3ZerT_nRP5QjlHLd3thLLM2Bg6S3N93ZPnUnnOp4ww5T3kJYdEFM', content='initializing')
-                response = webhook.execute()
                 #cleaning
                 # change date format to datetime
                 sellout['Date'] = pd.to_datetime(sellout['Date'])
@@ -630,10 +625,6 @@ def inventory_status():
                 status_text.text("Done!")
 
                 get_formatted_excel(order_planning)
-
-                # send Done by discord webhook
-                webhook = DiscordWebhook(url='https://discord.com/api/webhooks/1064563281798381708/nBbWnB5oQ-gYxU2m3ZerT_nRP5QjlHLd3thLLM2Bg6S3N93ZPnUnnOp4ww5T3kJYdEFM', content='Done')
-                response = webhook.execute()
 
         else:
             st.write("Please upload all the files")
