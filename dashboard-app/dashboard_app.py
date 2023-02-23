@@ -46,6 +46,7 @@ def create_dict(row):
         'Partner': row['Partner'],
         'Distributor': row['Distributor'],
         'Client': row['Client'],
+        'Status': row['Status'],
         'Bundle config id' : row['Bundle config id'],
         'Product number': row['Product'],
         'quantity': row['Quantity'],
@@ -770,6 +771,10 @@ def delivery_time():
 def database():
     # get the data from the api
     database_df = pd.DataFrame(get_data())
+    # if the dataframe is not empty
+    if not database_df.empty:
+        # reorder the columns purchase order number,Partner,Distributor,Client,Bundle config id,Product number,quantity,Description,Unit Price,Total Cost
+        database_df = database_df[['purchase order number','Partner','Distributor','Client','Status', 'Bundle config id','Product number','quantity','Description','Unit Price','Total Cost']]    
     # write the dataframe
     st.write(database_df)
     # create a button to refresh the data
@@ -784,7 +789,6 @@ def database():
     with col1.form('Add new data'):
         # write the title
         st.success('Add new data')
-        # fill the following data 'partner' 'distributor' 'client' 'Bundle config id'	'Product number'	'Component quantity'	'Description'	'Unit Cost Price (USD)'	'Total Cost Price (USD)'	'Unit Selling Price (USD)'	'Total Selling Price (USD)'
         # create a text input for the purchase order number
         purchase_order_number = st.text_input('purchase order number')
         # create a text input for the partner
@@ -793,8 +797,14 @@ def database():
         distributor = st.text_input('Distributor')
         # create a text input for the client
         client = st.text_input('Client')
+        # description 
+        st.write('Please copy and paste the selection in the "Order details" field as shown in the picture below')
+        # image display
+        st.image('https://cdn.discordapp.com/attachments/967246955619168329/1078259621598347284/selection_example.PNG')
         # paragraph input
-        input_text = st.text_area('Enter the text')
+        input_text = st.text_area('Order details')
+        # status
+        status = st.selectbox('Status', ['Processing', 'Production', 'In Transit', 'Delivered', 'Cancelled'])
 
         # submit button
         submit_button = st.form_submit_button('Submit')
@@ -803,8 +813,6 @@ def database():
         if submit_button:
             # write a success message
             st.success('Added data')
-            # refresh the page
-            # st.experimental_rerun()
             # create a file-like object from the input text
             input_file = io.StringIO(input_text)
 
@@ -816,22 +824,23 @@ def database():
             new_order_df['Partner'] = partner
             new_order_df['Distributor'] = distributor
             new_order_df['Client'] = client
+            st.write(status)
+            new_order_df['Status'] = status
 
             new_order_df = new_order_df.fillna('')
             
 
-            # display the dataframe in the Streamlit app
-            st.dataframe(new_order_df)
-
             # list of dicrionaries to add to the database
             list_of_dicts = new_order_df.apply(create_dict, axis=1).tolist()
-
-            st.write(list_of_dicts)
 
             # add the data to the database loop through the list of dictionaries
             for dict_ in list_of_dicts:
                 # add the data to the database
                 add_data(dict_)
+                st.write(dict_)
+            
+            # refresh the page
+            st.experimental_rerun()
 
     # if the database is not empty
     if len(database_df) > 0:
@@ -841,19 +850,37 @@ def database():
             st.warning('Input the index of the row to update')
             # create a integer input for the index unless the database is empty
             index = st.number_input('Index', min_value=0, max_value=len(database_df)-1)
+            # create an input for each field purchase order number,Partner,Distributor,Client,Bundle config id,Product number,quantity,Description,Unit Price,Total Cost
+            # create a text input for the purchase order number
+            purchase_order_number = st.text_input('purchase order number')
             # create a text input for the partner
             partner = st.text_input('Partner')
             # create a text input for the distributor
             distributor = st.text_input('Distributor')
             # create a text input for the client
             client = st.text_input('Client')
+            # create a text input for the bundle config id
+            bundle_config_id = st.text_input('Bundle config id')
+            # create a text input for the product number
+            product_number = st.text_input('Product number')
+            # create a text input for the quantity
+            quantity = st.text_input('quantity')
+            # create a text input for the description
+            description = st.text_input('Description')
+            # create a text input for the unit price
+            unit_price = st.text_input('Unit Price')
+            # create a text input for the total cost
+            total_cost = st.text_input('Total Cost')
+            # status
+            status = st.selectbox('Status', ['', 'Processing', 'Production', 'In Transit', 'Delivered', 'Cancelled'])
+
             # submit button
             submit_button = st.form_submit_button('Submit')
 
             # if the submit button is clicked
             if submit_button:
                 # update the data in the database
-                update_data(index, {'purchase order number' : partner, 'Partner' : partner, 'Distributor' : distributor, 'Client' : client, 'Bundle config id': bundle_config_id, 'Product number': product_number, 'Component quantity': component_quantity, 'Description': description, 'Unit Cost Price (USD)': unit_cost_price, 'Total Cost Price (USD)': total_cost_price, 'Unit Selling Price (USD)': unit_selling_price, 'Total Selling Price (USD)': total_selling_price, 'modified': 'last edit ' + str(pd.datetime.now().replace(microsecond=0))})
+                update_data(index, {'purchase order number': purchase_order_number, 'Partner': partner, 'Distributor': distributor, 'Client': client, 'Bundle config id': bundle_config_id, 'Product number': product_number, 'quantity': quantity, 'Description': description, 'Unit Price': unit_price, 'Total Cost': total_cost, 'Status': status})
                 # write a success message
                 st.success('Updated data')
                 # refresh the page

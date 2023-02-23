@@ -4,37 +4,39 @@ import numpy as np
 
 import flask
 
+file = '../src/data/data.csv'
+
 # create a read request to get the data from the csv file
 def read_data():
     # if the csv file does not exist, create it
     try:
-        df = pd.read_csv('data.csv')
+        df = pd.read_csv(file)
     except:
-        df = pd.DataFrame(columns=['purchase order number'])
-        df.to_csv('data.csv', index=False)
+        df = pd.DataFrame(columns=['purchase order number','Partner','Distributor','Client','Status', 'Bundle config id','Product number','quantity','Description','Unit Price','Total Cost'])
+        df.to_csv(file, index=False)
     return df.to_dict('records')
 
 # if an add request is made, add the data to the csv file
 def add_data(data):
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv(file)
     df = df.append(data, ignore_index=True)
-    df.to_csv('data.csv', index=False)
+    df.to_csv(file, index=False)
 
 # delete row from csv file by index
 def delete_data(index):
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv(file)
     df = df.drop(index)
-    df.to_csv('data.csv', index=False)
+    df.to_csv(file, index=False)
 
 # create a update request to update the data in the csv file
 def update_data(index, data):
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv(file)
     # if a input is not given, keep the old value
     for key in data:
         if data[key] == '':
             data[key] = df.loc[index][key]
     df.loc[index] = data
-    df.to_csv('data.csv', index=False)
+    df.to_csv(file, index=False)
 
 
 
